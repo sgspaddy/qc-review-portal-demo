@@ -1,6 +1,6 @@
 QC Review Portal (Demo)
 
-This repository contains a Django-based QC Review Portal built as a personal demo project for interview and code-review purposes.
+This repository contains a Django-based QC Review Portal built as a personal demo project for code-review purposes.
 The application demonstrates my backend architecture, API design, business-logic separation, and UI implementation using a realistic clinical QC workflow.
 
 The domain and functionality are inspired by a production QC Checker application, but the implementation, structure, and naming are intentionally redesigned for demonstration.
