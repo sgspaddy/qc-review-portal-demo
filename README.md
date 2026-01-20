@@ -104,3 +104,11 @@ These differences ensure the repository is **safe, portable, and interview-appro
 - Session-based authentication  
 
 ---
+
+## Dashboard
+
+![QC Dashboard](dashboard.png)
+
+## Specimen Review
+
+![Specimen Review](speciman_detail.png)
