@@ -1,193 +1,106 @@
-QC Review Portal (Demo)
+# QC Review Portal (Demo)
 
-This repository contains a Django-based QC Review Portal built as a personal demo project for code-review purposes.
-The application demonstrates my backend architecture, API design, business-logic separation, and UI implementation using a realistic clinical QC workflow.
+A **Django-based QC Review Portal** built as a **personal demo project** to showcase backend architecture, API design, and UI integration using a realistic clinical QC workflow.
 
-The domain and functionality are inspired by a production QC Checker application, but the implementation, structure, and naming are intentionally redesigned for demonstration.
+The functionality is inspired by a production **QC Checker** system, but the codebase, structure, and naming are intentionally redesigned for demonstration and interview use.
 
-Purpose of this demo
+---
 
-This project is designed to showcase:
+## Purpose
 
-Clean Django project structure
+This project demonstrates:
 
-Separation of concerns (rules, services, views, APIs)
+- Clean Django project structure  
+- Clear separation of concerns (rules, services, views, APIs)  
+- Practical database modeling with external database support  
+- REST APIs and HTML UI sharing the same business logic  
+- Realistic QC decision logic with full audit trails  
+- Readable, maintainable, human-written code  
 
-Practical database modeling
+All data is **synthetic** and contains **no patient information**.
 
-REST API + HTML UI living side-by-side
+---
 
-Realistic QC decision logic and audit trails
+## Core Features
 
-Readable, maintainable, “human-written” code style
+### QC Metric Evaluation
+- Stores specimen-level QC metrics (reads, contamination, coverage)
+- Supports **NORMAL**, **TUMOR**, and **CONTROL** specimen types
+- Automated rule-based QC decisions:
+  - **PASS**
+  - **FAIL**
+  - **NEEDS_REPEAT**
+  - **PENDING**
 
-It is not connected to real patient data and uses synthetic demo records only.
+---
 
-Core functionality
-1. QC Metric Ingestion (Mocked)
+### Run-Level QC Status (CONTROL-based)
+- Run status is derived **only from CONTROL specimens**
+  - All controls **PASS** → Run **PASS**
+  - Any control **FAIL** → Run **FAIL**
+  - No control present → Run **PENDING**
 
-Stores specimen-level QC metrics (reads, contamination, coverage)
+---
 
-Supports multiple specimen types:
+### Reviewer Decision Workflow
+- Reviewers can override automated decisions
+- Each decision records:
+  - Decision value
+  - Reviewer
+  - Timestamp
+  - Optional comment
+- Full decision history is preserved for auditing
 
-NORMAL
+---
 
-TUMOR
+### Web UI
+- Dashboard with filtering and pagination
+- Run detail view showing all specimens in a run
+- Specimen review page with:
+  - Computed QC result
+  - Metric breakdown
+  - Reviewer decision form
+  - Decision history
 
-CONTROL
+---
 
-Data is stored in an external database (via DATABASE_URL, mocked for demo)
+### REST API
+- List sequencing runs
+- Retrieve run specimens and run QC status
+- Retrieve specimen-level QC details
+- Submit reviewer decisions programmatically
 
-This mirrors how QC metrics are persisted in the real QC Checker system.
+The UI and API share the same underlying business logic.
 
-2. Automated QC Evaluation
+---
 
-Each specimen is automatically evaluated using rule-based thresholds:
+## Relationship to the Production QC Checker
 
-PASS
+### Intentionally the Same
+- QC decision logic and workflow concepts  
+- CONTROL-based run status computation  
+- Automated and manual review flow  
+- Decision audit trail  
+- Combined UI and API access patterns  
 
-FAIL
+### Intentionally Different
+- Simplified schema and QC thresholds  
+- Synthetic demo data only  
+- Renamed models and modules  
+- No production integrations (LIMS, pipelines, file watchers)  
+- No PHI or clinical identifiers  
 
-NEEDS_REPEAT
+These differences ensure the repository is **safe, portable, and interview-appropriate**.
 
-PENDING (missing data)
+---
 
-Rules are:
+## Tech Stack
 
-Centralized in a rules module
-
-Independent from views and APIs
-
-Easy to adjust or extend
-
-This matches the automated QC scoring logic in the production QC Checker app.
-
-3. Run-Level QC Status (CONTROL-based)
-
-Run status is derived only from CONTROL specimens
-
-Logic:
-
-All controls PASS → Run PASS
-
-Any control FAIL → Run FAIL
-
-No control present → Run PENDING
-
-This is the same run-level logic used in the real application.
-
-4. Reviewer Decision Workflow
-
-Reviewers can override automated decisions
-
-Each decision records:
-
-Decision value
-
-Reviewer
-
-Timestamp
-
-Optional comment
-
-Full decision history is retained (audit-friendly)
-
-This mirrors the manual review and audit trail functionality of the QC Checker.
-
-5. Web UI (HTML + Bootstrap)
-
-The UI provides:
-
-Dashboard with filtering and pagination
-
-Run detail view (all specimens in a run)
-
-Specimen review page with:
-
-Computed QC result
-
-Metric breakdown
-
-Reviewer decision form
-
-Decision history
-
-UI behavior and information density closely match the production QC Checker, but with simplified styling for demo clarity.
-
-6. REST API (Django REST Framework)
-
-The same data and logic are exposed via APIs:
-
-List runs
-
-Retrieve run specimens + run QC status
-
-Retrieve specimen details
-
-Submit reviewer decisions programmatically
-
-This demonstrates:
-
-Shared business logic between UI and API
-
-Clean, versioned endpoints
-
-Backend-first design
-
-What is intentionally the same as the real QC Checker
-
-QC decision logic concepts
-
-CONTROL-based run status
-
-Automated + manual review flow
-
-Decision audit trail
-
-Separation of ingestion, evaluation, and review
-
-Combination of UI and API access patterns
-
-What is intentionally different
-
-Simplified schema and thresholds
-
-Synthetic demo data only
-
-Renamed models and modules
-
-No production integrations (LIMS, file watchers, pipelines)
-
-No PHI / clinical identifiers
-
-These changes ensure this repository is safe, portable, and interview-appropriate.
-
-Tech stack
-
-Python
-
-Django
-
-Django REST Framework
-
-External DB via DATABASE_URL (Postgres/MySQL compatible)
-
-HTML templates + Bootstrap
-
-Session-based authentication
-
-Intended audience
-
-Engineering interviewers
-
-Code reviewers
-
-Hiring managers evaluating:
-
-Backend design
-
-Django best practices
-
-Business-logic modeling
-
-Real-world system thinking
+- Python  
+- Django  
+- Django REST Framework  
+- External database via `DATABASE_URL` (PostgreSQL / MySQL compatible)  
+- HTML templates with Bootstrap  
+- Session-based authentication  
+
+---
