@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Review — {{ specimen.case_id }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    :root{ --brand:#4c1d95; --line:rgba(0,0,0,.08); }
+    .card{ border-radius:14px; border:1px solid var(--line); }
+    .pill{ font-weight:700; border-radius:999px; padding:.25rem .65rem; font-size:.85rem; display:inline-block; }
+    .pill-pass{ background:rgba(16,185,129,.12); color:#065f46; border:1px solid rgba(16,185,129,.25); }
+    .pill-fail{ background:rgba(239,68,68,.10); color:#7f1d1d; border:1px solid rgba(239,68,68,.25); }
+    .pill-pending{ background:rgba(59,130,246,.10); color:#1e3a8a; border:1px solid rgba(59,130,246,.25); }
+    .pill-repeat{ background:rgba(245,158,11,.12); color:#78350f; border:1px solid rgba(245,158,11,.25); }
+    a{ color:var(--brand); text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+  </style>
+</head>
+<body class="bg-light">
+  <div class="container my-4">
+
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <div class="fw-bold fs-5">Specimen review</div>
+        <div class="text-muted">Run {{ specimen.run.run_id }} · {{ specimen.case_id }}</div>
+      </div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-outline-secondary" href="{% url 'dashboard' %}">Back</a>
+        <a class="btn btn-outline-secondary" href="{% url 'logout' %}">Logout</a>
+      </div>
+    </div>
+
+    {% if messages %}
+      {% for m in messages %}
+        <div class="alert alert-{{ m.tags }} py-2">{{ m }}</div>
+      {% endfor %}
+    {% endif %}
+
+    <div class="row g-3">
+      <div class="col-12 col-lg-7">
+        <div class="card p-3">
+          <div class="d-flex align-items-center justify-content-between">
+            <div>
+              <div class="fw-semibold">{{ specimen.specimen_name }}</div>
+              <div class="text-muted small">{{ specimen.specimen_type }}</div>
+            </div>
+            <div>
+              {% if computed.computed_decision == "PASS" %}
+                <span class="pill pill-pass">Computed PASS</span>
+              {% elif computed.computed_decision == "FAIL" %}
+                <span class="pill pill-fail">Computed FAIL</span>
+              {% elif computed.computed_decision == "NEEDS_REPEAT" %}
+                <span class="pill pill-repeat">Computed NEEDS_REPEAT</span>
+              {% else %}
+                <span class="pill pill-pending">Computed PENDING</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="row g-2">
+            <div class="col-12 col-md-4">
+              <div class="text-muted small">Mapped reads</div>
+              <div class="fw-semibold">{% if specimen.mapped_reads %}{{ specimen.mapped_reads|intcomma }}{% else %}—{% endif %}</div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="text-muted small">Contamination</div>
+              <div class="fw-semibold">{% if specimen.contamination != None %}{{ specimen.contamination }}{% else %}—{% endif %}</div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="text-muted small">Mean coverage</div>
+              <div class="fw-semibold">{% if specimen.mean_coverage != None %}{{ specimen.mean_coverage }}{% else %}—{% endif %}</div>
+            </div>
+          </div>
+
+          {% if computed.reasons %}
+            <div class="mt-3">
+              <div class="text-muted small mb-1">Computed reasons</div>
+              <ul class="mb-0">
+                {% for r in computed.reasons %}
+                  <li>{{ r }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="card p-3 mt-3">
+          <div class="fw-semibold mb-2">Decision history</div>
+          {% if specimen.decisions.all %}
+            <div class="vstack gap-2">
+              {% for d in specimen.decisions.all %}
+                <div class="border rounded p-2 bg-white">
+                  <div class="d-flex justify-content-between">
+                    <div class="fw-semibold">{{ d.decision }}</div>
+                    <div class="text-muted small">{{ d.decided_by.username }} · {{ d.decided_at|date:"Y-m-d H:i" }}</div>
+                  </div>
+                  {% if d.comment %}
+                    <div class="text-muted small mt-1">{{ d.comment }}</div>
+                  {% endif %}
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-muted">No reviewer decisions yet.</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-5">
+        <div class="card p-3">
+          <div class="fw-semibold mb-2">Reviewer decision</div>
+
+          {% if latest %}
+            <div class="text-muted small mb-2">
+              Latest: <strong>{{ latest.decision }}</strong> by {{ latest.decided_by.username }} · {{ latest.decided_at|date:"Y-m-d H:i" }}
+            </div>
+          {% else %}
+            <div class="text-muted small mb-2">No reviewer decision yet. Choose one below.</div>
+          {% endif %}
+
+          <form method="post" action="{% url 'submit_decision' specimen.id %}" class="vstack gap-2">
+            {% csrf_token %}
+            <div>
+              {{ form.decision }}
+            </div>
+            <div>
+              {{ form.comment }}
+            </div>
+            <button class="btn btn-primary">Save decision</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Humanize for commas -->
+  {% load humanize %}
+</body>
+</html>
